@@ -35,7 +35,7 @@ const metadata = {};
 
 function cloneRepo() {
 	try {
-		childProcess.execSync(`git clone --local ${  flags.repo  } .mdtmp`);
+		childProcess.execSync(`git clone --local ${flags.repo} .mdtmp`);
 		childProcess.execSync('cd .mdtmp && git checkout -b test && cd ..');
 		return true;
 	} catch (err) {
@@ -67,7 +67,7 @@ function getFiles(srcpath) {
 function getFullUri(obj) {
 	if (!obj.object) return '';
 	if (!obj.object.parent) {
-		return `/organizations/${  obj.identity.name}`;
+		return `/organizations/${obj.identity.name}`;
 	}
 
 	// console.log('parent',obj.object.parent.name,'parts',parts,'res=',parentUri);
@@ -76,38 +76,39 @@ function getFullUri(obj) {
 		// console.log(obj.object);
 	}
 
-	return `${obj.object.parent.name  }/${  obj.object.type  }s/${  obj.identity.name}`;
+	return `${obj.object.parent.name}/${obj.object.type}s/${obj.identity.name}`;
 }
 
 function nonCSCompare(str1, str2) {
 	if (!str1 && !str2) {
 		// This is two empty strings case, we consider it equal
 		return true;
-	} if ((str1 && !(typeof str1 === 'string')) || (str2 && !(typeof str2 === 'string'))) {
+	}
+	if ((str1 && !(typeof str1 === 'string')) || (str2 && !(typeof str2 === 'string'))) {
 		// We compare null or different types
 		console.warn('nonCSCompare one of arguments is falsy', str1, str2);
 		return false;
-	} if (!str1 || !str2) {
+	}
+	if (!str1 || !str2) {
 		// We are compare null with string
 		return false;
 	}
-		// Let's compare strings
-		return str1.toLowerCase() === str2.toLowerCase();
-
+	// Let's compare strings
+	return str1.toLowerCase() === str2.toLowerCase();
 }
-
 
 function getVersionStatus(version) {
 	// SEfalt status is draft
 	let status = 'draft';
 	if (!version || !version.object || !version.object.history || !version.object.history.completions) {
 		// console.log("getVersionStatus:draft for ",JSON.stringify(version));
-		if (version && version.object && version.object.history)
+		if (version && version.object && version.object.history) {
 			// console.log("getVersionStatus:draft for ",version.identity.name,JSON.stringify(version.object.history));
-			{return status;}
+			return status;
+		}
 	}
 
-	const {completions} = version.object.history;
+	const { completions } = version.object.history;
 
 	// Analize completion to have version status
 	if (completions) {
@@ -124,10 +125,10 @@ function refToFileName(ref) {
 	if (ref.indexOf('/versions/') != -1) {
 		const match = ref.match(/\/versions\/(\d+\.\d+\.\d+)/);
 		console.log('match', match, ref);
-		version = `-${  match[1]}`;
+		version = `-${match[1]}`;
 	}
 	let ret = ref.replace(/\/versions\/\d+\.\d+\.\d+/g, '').replace(/:/g, '%');
-	ret = `${ret + version  }.json`;
+	ret = `${ret + version}.json`;
 	console.log('refToFileName', ref, ret);
 	return ret;
 }
@@ -159,7 +160,7 @@ function scanDirectory(dir, metapath) {
 			// console.log("Looking for ", (metapath + '/' + objName).toLowerCase(), " in ", metadataPathFilter);
 			let found = false;
 			for (let fi = 0; fi < metadataPathFilter.length; fi++) {
-				if ((`${metapath  }/${  objName}`).toLowerCase().indexOf(metadataPathFilter[fi].toLowerCase()) !== -1) {
+				if (`${metapath}/${objName}`.toLowerCase().indexOf(metadataPathFilter[fi].toLowerCase()) !== -1) {
 					found = true;
 					break;
 				}
@@ -169,18 +170,18 @@ function scanDirectory(dir, metapath) {
 
 		//		console.log("metapath", metapath + '/' + objName);
 		if (flags.servicetoken && metapath.indexOf('/organizations') !== -1) {
-			console.log('will fetch ', `https://metaserviceprod.azurewebsites.net/api${  metapath  }/${  objName}`);
+			console.log('will fetch ', `https://metaserviceprod.azurewebsites.net/api${metapath}/${objName}`);
 			try {
 				obj[objName.toLowerCase()] = JSON.parse(
-					request('GET', `https://metaserviceprod.azurewebsites.net/api${  metapath  }/${  objName}`, {
+					request('GET', `https://metaserviceprod.azurewebsites.net/api${metapath}/${objName}`, {
 						headers: {
-							Authorization: `Bearer ${  flags.servicetoken}`,
+							Authorization: `Bearer ${flags.servicetoken}`,
 						},
 					}).getBody()
 				);
 				console.log('fetched ', objName.toLowerCase());
 			} catch (e) {
-				console.error(`could not fetch ${  metapath  }/${  objName}`, e);
+				console.error(`could not fetch ${metapath}/${objName}`, e);
 				obj[objName.toLowerCase()] = require(path.join(dir, f));
 			}
 		} else {
@@ -204,17 +205,16 @@ function scanDirectory(dir, metapath) {
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				object.datasets.map((dataset) => {
-					dataset._path = `${appPath  }/datasets/${  dataset.identity.name}`;
+					dataset._path = `${appPath}/datasets/${dataset.identity.name}`;
 				});
 			}
-
 
 			if (object.interfaces) {
 				var appPath = object._path;
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				object.interfaces.map((dataset) => {
-					dataset._path = `${appPath  }/interfaces/${  dataset.identity.name}`;
+					dataset._path = `${appPath}/interfaces/${dataset.identity.name}`;
 				});
 			}
 		}
@@ -226,7 +226,7 @@ function scanDirectory(dir, metapath) {
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				object.datasets.map((dataset) => {
-					dataset._path = `${appPath  }/datasets/${  dataset.identity.name}`;
+					dataset._path = `${appPath}/datasets/${dataset.identity.name}`;
 				});
 			}
 			if (object.interfaces) {
@@ -234,7 +234,7 @@ function scanDirectory(dir, metapath) {
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				appPath = appPath.substr(0, appPath.lastIndexOf('/'));
 				object.interfaces.map((dataset) => {
-					dataset._path = `${appPath  }/interfaces/${  dataset.identity.name}`;
+					dataset._path = `${appPath}/interfaces/${dataset.identity.name}`;
 				});
 			}
 		}
@@ -292,9 +292,9 @@ function scanDirectory(dir, metapath) {
 				if (def.elements) {
 					def.elements.map((element) => {
 						if (element.image) {
-							const imageUrl = `${element.image.replace(/[^A-Za-z_0-9-]+/g, '_')  }.png`;
+							const imageUrl = `${element.image.replace(/[^A-Za-z_0-9-]+/g, '_')}.png`;
 							if (!fs.existsSync(path.join(flags.targetDir ? flags.targetDir : '', 'resources', imageUrl))) {
-								console.log(`Found external resource: ${  element.image  } in object ${  object._path}`);
+								console.log(`Found external resource: ${element.image} in object ${object._path}`);
 								const imageData = request(
 									'GET',
 									element.image.replace('https://bias-metadata-service.difhub.com', 'https://apdax-metadata-service-dev.azurewebsites.net')
@@ -313,7 +313,7 @@ function scanDirectory(dir, metapath) {
 		}
 
 		if (flags.json) {
-			const filePath = `${path.join(flags.targetDir ? flags.targetDir : '', object._path)  }.json`;
+			const filePath = `${path.join(flags.targetDir ? flags.targetDir : '', object._path)}.json`;
 			fs.mkdirSync(path.dirname(filePath), { recursive: true });
 			fs.writeFile(filePath, flags.pretty !== false ? JSON.stringify(object, null, 2) : JSON.stringify(object), () => {});
 		}
@@ -328,7 +328,7 @@ function scanDirectory(dir, metapath) {
 	for (let i = 0; i < dirs.length; i++) {
 		const d = dirs[i];
 
-		obj[d.toLowerCase()] = scanDirectory(`${dir  }/${  d}`, metapath == '' ? `/organizations/${  d}` : `${metapath  }/${  d}`);
+		obj[d.toLowerCase()] = scanDirectory(`${dir}/${d}`, metapath == '' ? `/organizations/${d}` : `${metapath}/${d}`);
 	}
 
 	// console.log(rootObj, typeof rootObj);
@@ -364,9 +364,9 @@ let metadataApiString = '';
 let exportsString = 'export {metadata, findByPath';
 for (const item in metadataApi) {
 	// console.log("item", item, metadataApi[item]);
-	if (typeof metadataApi[item] === 'function') metadataApiString += `var ${  item  } = ${  metadataApi[item].toString()  }; \n`;
-	else metadataApiString += `var ${  item  } = ${  JSON.stringify(metadataApi[item])  }; \n`;
-	exportsString += `, ${  item}`;
+	if (typeof metadataApi[item] === 'function') metadataApiString += `var ${item} = ${metadataApi[item].toString()}; \n`;
+	else metadataApiString += `var ${item} = ${JSON.stringify(metadataApi[item])}; \n`;
+	exportsString += `, ${item}`;
 }
 exportsString += '}; ';
 
@@ -376,7 +376,7 @@ function writeMetadata(dir) {
 		metadataPathFilter = include_str.split('\n').map((s) => s.trim());
 	}
 	if (flags.includeOrg) {
-		metadataPathFilter = `/organizations/${  flags.includeOrg}`;
+		metadataPathFilter = `/organizations/${flags.includeOrg}`;
 	}
 
 	console.log('Graber:SCAN', dir, flags);
@@ -391,7 +391,7 @@ function writeMetadata(dir) {
 			fs.writeFile(
 				outputFilename,
 				//			"var metadata_apdax = " + JSON.stringify(metadata_apdax, null, 2) + ";" +
-				`var metadata = ${  json  }\n${  findByPath.toString()  }${metadataApiString  }${exportsString}`, // "module.exports = {metadata: metadata, findByPath: findByPath};",
+				`var metadata = ${json}\n${findByPath.toString()}${metadataApiString}${exportsString}`, // "module.exports = {metadata: metadata, findByPath: findByPath};",
 				() => {
 					console.log('Metadata saved to', outputFilename);
 				}
@@ -400,7 +400,7 @@ function writeMetadata(dir) {
 			fs.writeFileSync(outputJSONFilename, json);
 			fs.writeFile(
 				outputFilename,
-				`const metadata = require('./metadata.json'); \n${  findByPath.toString()  }${metadataApiString  }${exportsString}`, // "module.exports = {metadata: metadata, findByPath: findByPath};",
+				`const metadata = require('./metadata.json'); \n${findByPath.toString()}${metadataApiString}${exportsString}`, // "module.exports = {metadata: metadata, findByPath: findByPath};",
 				() => {
 					console.log('Metadata saved to', outputFilename);
 				}
@@ -411,7 +411,7 @@ function writeMetadata(dir) {
 
 if (flags.metadataDir) {
 	console.log(flags.metadataDir);
-	const dir = path.join(process.cwd(), `${flags.metadataDir  }/organizations`);
+	const dir = path.join(process.cwd(), `${flags.metadataDir}/organizations`);
 	writeMetadata(dir);
 }
 if (flags.repo) {

@@ -1,8 +1,8 @@
-# dh-metadata-grubber
+# muc-grubber
 This is alpha version of npm-module that grubs selected metadata from DifHub project and compiles it to js module
 
 ## Installation
-```npm install --save git://github.com/DifHub/dh-metadata-grubber```
+```npm i muc-grubber```
 
 ## Usage
 Alpha version of this module works only with local repositories. So you have to clone metadata repository to your local 
