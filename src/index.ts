@@ -19,6 +19,7 @@ args.option('json', 'Generate json files instead of metadata.js', false);
 args.option('servicetoken', 'Get metadata from backend service (not git) using specified access token', '');
 args.option('skipresources', 'Skip downloading of resources from views', false);
 args.option('noEmbed', 'Skip downloading of resources from views', false);
+args.option('skipEnum', 'Skip enums', false);
 
 const flags = args.parse(process.argv);
 
@@ -186,6 +187,19 @@ function scanDirectory(dir, metapath) {
 			}
 		} else {
 			obj[objName.toLowerCase()] = require(path.join(dir, f));
+			const rawJson = require(path.join(dir, f));
+			if (flags.skipEnum && rawJson.object.usage === 'Enum') {
+				obj[objName.toLowerCase()] = {
+					identity: {
+						name: ''
+					},
+					object: {
+						history: {}
+					}
+				};
+			} else {
+				obj[objName.toLowerCase()] = rawJson;
+			}
 		}
 		const object = obj[objName.toLowerCase()];
 		object._path = getFullUri(object);

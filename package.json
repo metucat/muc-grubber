@@ -1,6 +1,6 @@
 {
   "name": "muc-grubber",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "bin": {
     "muc-grubber": "dist/index.js"
